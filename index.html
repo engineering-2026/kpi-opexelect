@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KPI OPEX Utilities Listrik — Wisma 46 Kota BNI</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1117;--sf:#1a1d27;--sf2:#232736;--bd:#2d3248;--tw:#e8eaf0;--td:#8b90a5;--ac:#6366f1;--gn:#22c55e;--gd:#1D9E75;--or:#f59e0b;--rd:#ef4444;--bl:#378ADD;--pu:#a855f7;--cy:#06b6d4}
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--tw)}
+.app{max-width:1440px;margin:0 auto}
+.hdr{border-bottom:1px solid var(--bd);padding:14px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.hdr h1{font-size:1.3rem;font-weight:800;background:linear-gradient(135deg,#6366f1,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hdr .sub{color:var(--td);font-size:.72rem;margin-top:3px}
+.tabs{display:flex;gap:5px;flex-wrap:wrap}.tabs button{padding:5px 12px;border-radius:7px;font-size:10px;font-weight:700;border:1px solid var(--bd);background:transparent;color:var(--td);cursor:pointer;text-transform:uppercase;letter-spacing:.04em;transition:.2s}
+.tabs button.on{background:var(--ac);border-color:var(--ac);color:#fff}.tabs button:hover{border-color:var(--ac);color:var(--tw)}
+.btn-i{padding:7px 16px;border-radius:8px;font-size:11px;font-weight:700;border:2px solid var(--bl);background:transparent;color:var(--bl);cursor:pointer;animation:pu 2s infinite}
+.btn-i:hover{background:var(--bl);color:#fff}
+@keyframes pu{0%,100%{box-shadow:0 0 0 0 rgba(55,138,221,.4)}50%{box-shadow:0 0 0 8px rgba(55,138,221,0)}}
+.btn-e{padding:5px 12px;border-radius:7px;font-size:10px;font-weight:700;border:1px solid var(--gn);background:transparent;color:var(--gn);cursor:pointer}.btn-e:hover{background:var(--gn);color:#fff}
+.btn-s{padding:5px 12px;border-radius:7px;font-size:10px;font-weight:700;border:1px solid var(--or);background:transparent;color:var(--or);cursor:pointer}.btn-s:hover{background:var(--or);color:#fff}
+.btn-l{padding:5px 12px;border-radius:7px;font-size:10px;font-weight:700;border:1px solid var(--cy);background:transparent;color:var(--cy);cursor:pointer}.btn-l:hover{background:var(--cy);color:#fff}
+.body{padding:16px 20px}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px;margin-bottom:14px}
+.kpi{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:11px 13px;position:relative;overflow:hidden}
+.kpi .bar{position:absolute;top:0;left:0;right:0;height:3px}.kpi .lb{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--td);margin-bottom:4px}
+.kpi .vl{font-size:1.4rem;font-weight:800;font-family:'JetBrains Mono',monospace}.kpi .su{font-size:.6rem;color:var(--td);margin-top:2px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.cd{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:13px}.cd.f{grid-column:1/-1}
+.cd h3{font-size:.75rem;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:5px}.cd h3 .d{width:6px;height:6px;border-radius:50%;display:inline-block}
+.cw{position:relative;width:100%;height:280px}.cw.t{height:320px}
+table{width:100%;border-collapse:collapse;font-size:10px}th{padding:5px 7px;text-align:center;color:var(--tw);font-weight:700;background:var(--sf2);border:1px solid var(--bd);white-space:nowrap;font-size:9px}
+td{padding:3px 5px;border:1px solid var(--bd);white-space:nowrap;font-size:10px}
+.tl{color:var(--td);font-weight:600;min-width:80px}
+input.cl{width:78px;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;padding:3px 5px;color:var(--gn);font-family:'JetBrains Mono',monospace;font-size:10px;text-align:center;outline:none}
+input.cl:focus{border-color:var(--ac);box-shadow:0 0 0 2px rgba(99,102,241,.15)}
+.cm{font-family:'JetBrains Mono',monospace;text-align:center;font-weight:700}.gn{color:var(--gn)}.og{color:var(--or)}.rd{color:var(--rd)}.bl{color:var(--bl)}.pp{color:var(--pu)}.dm{color:var(--td)}
+.tr{border-top:2px solid var(--ac)}.ks{background:rgba(29,158,117,.1)}
+.fi{background:var(--sf2);border:1px solid var(--gn);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--gn);margin-bottom:12px;display:none;align-items:center;gap:8px}.fi.sh{display:flex}
+.fi b{font-family:'JetBrains Mono',monospace}
+.tp{background:var(--sf2);border-radius:8px;padding:10px 14px;font-size:11px;color:var(--td);margin-top:10px;line-height:1.9}.tp b{color:var(--ac)}
+.toast{position:fixed;top:14px;right:14px;padding:8px 18px;border-radius:8px;font-weight:700;font-size:11px;z-index:999;display:none}.toast.sh{display:block}.toast.ok{background:var(--gn);color:#fff;box-shadow:0 4px 14px rgba(34,197,94,.3)}.toast.er{background:var(--rd);color:#fff;box-shadow:0 4px 14px rgba(239,68,68,.3)}
+.hd{display:none}
+@media(max-width:800px){.g2{grid-template-columns:1fr}.kpi-row{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="toast" id="ts"></div>
+<div class="hdr">
+<div><h1>KPI OPEX UTILITIES — LISTRIK</h1><div class="sub">Wisma 46 — Kota BNI | PT Swadharma Primautama | Engineering | 2026</div></div>
+<div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
+<div class="tabs">
+<button class="on" onclick="sw('dash',this)">Dashboard</button>
+<button onclick="sw('inp',this)">Input Data</button>
+<button onclick="sw('en',this)">Energy</button>
+<button onclick="sw('co',this)">CO₂</button>
+</div>
+<button class="btn-i" onclick="document.getElementById('fi').click()">📂 Import Excel</button>
+<button class="btn-e" onclick="exCSV()">⬇ Export</button>
+<button class="btn-s" onclick="saveLocal()">💾 Save</button>
+<button class="btn-l" onclick="loadLocal()">📥 Load</button>
+<input type="file" id="fi" accept=".xlsx,.xls,.csv" style="display:none" onchange="hFile(this)">
+</div>
+</div>
+<div class="body">
+<div class="fi" id="fst">📎 <b id="fn"></b> — <span id="fc"></span> data diimport ✓</div>
+
+<div id="v-dash">
+<div class="kpi-row" id="kp"></div>
+<div class="cd f" style="margin-bottom:12px"><h3><span class="d" style="background:var(--ac)"></span>Planning vs Realisasi + Target KPI</h3><div class="cw t"><canvas id="c1"></canvas></div></div>
+<div class="g2">
+<div class="cd"><h3><span class="d" style="background:#7F77DD"></span>Progress Efisiensi (%)</h3><div class="cw"><canvas id="c2"></canvas></div></div>
+<div class="cd"><h3><span class="d" style="background:var(--bl)"></span>Konsumsi Energi (kWh)</h3><div class="cw"><canvas id="c3"></canvas></div></div>
+</div>
+<div class="g2">
+<div class="cd"><h3><span class="d" style="background:var(--cy)"></span>Tren Kumulatif kWh/m²</h3><div class="cw"><canvas id="c4"></canvas></div></div>
+<div class="cd"><h3><span class="d" style="background:var(--pu)"></span>CO₂ Emisi (Ton)</h3><div class="cw"><canvas id="c5"></canvas></div></div>
+</div>
+</div>
+
+<div id="v-inp" class="hd"><div class="cd"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px"><h3 style="margin:0;color:var(--ac)">Record Pemakaian Energi Listrik — kWh/m²</h3><span style="font-size:9px;color:var(--td);background:var(--sf2);padding:2px 8px;border-radius:12px;font-family:'JetBrains Mono'">Target ≤12.4</span></div><div style="overflow-x:auto"><table id="t1"></table></div></div>
+<div class="tp"><b>💡 Cara Link dengan Excel:</b><br>1. Edit data di file Excel → klik <b>📂 Import Excel</b> → semua grafik langsung terupdate<br>2. Klik <b>💾 Save</b> untuk simpan data ke browser (data tetap ada walau halaman di-refresh)<br>3. Di laptop/PC lain: buka link yang sama → klik <b>📂 Import Excel</b> untuk load data<br>4. Atau klik <b>⬇ Export</b> → kirim CSV via email → di PC lain Import file CSV tersebut<br><br><b>🌐 Cara Share Link:</b><br>• Upload file ini ke <b>GitHub Pages</b> (gratis) → dapat link yang bisa diakses semua orang<br>• Atau upload ke <b>Netlify</b> (drag & drop, gratis) → langsung dapat URL publik</div>
+</div>
+
+<div id="v-en" class="hd"><div class="cd" style="margin-bottom:12px"><h3 style="color:var(--bl)">Consumption Energy (kWh)</h3><div style="overflow-x:auto"><table id="t2"></table></div></div>
+<div class="g2"><div class="cd"><h3><span class="d" style="background:var(--bl)"></span>Energi Plan vs Real</h3><div class="cw"><canvas id="c6"></canvas></div></div><div class="cd"><h3><span class="d" style="background:var(--cy)"></span>Kumulatif Energi</h3><div class="cw"><canvas id="c7"></canvas></div></div></div></div>
+
+<div id="v-co" class="hd"><div class="cd" style="margin-bottom:12px"><h3 style="color:var(--pu)">Data CO₂ Emisi</h3><div style="overflow-x:auto"><table id="t3"></table></div></div>
+<div class="g2"><div class="cd"><h3><span class="d" style="background:var(--pu)"></span>Emisi CO₂ (Ton)</h3><div class="cw"><canvas id="c8"></canvas></div></div><div class="cd"><h3><span class="d" style="background:var(--or)"></span>Intensitas Energi</h3><div class="cw"><canvas id="c9"></canvas></div></div></div></div>
+</div>
+</div>
+
+<script>
+const M=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"],QC=["#C0392B","#2E86C1","#27AE60","#F39C12"],QM=[0,0,0,1,1,1,2,2,2,3,3,3];
+const tt={backgroundColor:'#1a1d27',titleColor:'#e8eaf0',bodyColor:'#e8eaf0',borderColor:'#2d3248',borderWidth:1,cornerRadius:8,padding:8};
+const D={cp:[5.2,5.2,5.2,5.2,5.2,5.2,5.2,5.2,5.2,5.2,5.2,5.2],cr:[4.217827,3.672548,0,null,null,null,null,null,null,null,null,null],op:[7.2,7.2,7.2,7.2,7.2,7.2,7.2,7.2,7.2,7.2,7.2,7.2],or:[7.103502,6.605871,0,null,null,null,null,null,null,null,null,null],ep:[1001032,978864,997416,950912,993712,1012720,1107680,1035984,1017032,1116632,1056549,1063404],er:[1009696,911312,null,null,null,null,null,null,null,null,null,null],ca:[64977.53,65322.50,null,null,null,null,null,null,null,null,null,null]};
+let ch={},ct='dash';
+const tP=i=>D.cp[i]+D.op[i],tR=i=>(D.cr[i]==null&&D.or[i]==null)?null:(D.cr[i]||0)+(D.or[i]||0);
+const f=(v,d=2)=>v!=null?Number(v).toFixed(d):"—",fN=v=>v!=null?Math.round(v).toLocaleString("id-ID"):"—",pc=(p,r)=>r!=null&&r>0?(p/r*100).toFixed(1):"—";
+
+function toast(m,t='ok'){const e=document.getElementById('ts');e.textContent=m;e.className='toast sh '+t;setTimeout(()=>e.classList.remove('sh'),3e3)}
+
+// ======== SAVE/LOAD localStorage ========
+function saveLocal(){try{localStorage.setItem('kpi_data',JSON.stringify(D));toast("💾 Data tersimpan di browser ini!")}catch(e){toast("Gagal simpan",'er')}}
+function loadLocal(){try{const s=localStorage.getItem('kpi_data');if(s){const d=JSON.parse(s);Object.assign(D,d);rfAll();toast("📥 Data berhasil di-load!")}else toast("Belum ada data tersimpan",'er')}catch(e){toast("Gagal load",'er')}}
+
+// Auto-load on start
+try{const s=localStorage.getItem('kpi_data');if(s){const d=JSON.parse(s);Object.assign(D,d)}}catch(e){}
+
+// ======== FILE IMPORT ========
+function hFile(inp){const file=inp.files[0];if(!file)return;const ext=file.name.split('.').pop().toLowerCase();const rd=new FileReader();rd.onload=function(e){try{ext==='csv'?pCSV(e.target.result,file.name):pXLS(e.target.result,file.name)}catch(err){toast("Gagal: "+err.message,'er')}};ext==='csv'?rd.readAsText(file):rd.readAsArrayBuffer(file);inp.value=''}
+
+function pXLS(buf,fn){
+const wb=XLSX.read(buf,{type:'array'}),ws=wb.Sheets[wb.SheetNames[0]],rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:null});
+let fo=0;
+for(let r=0;r<rows.length;r++){const row=rows[r];if(!row)continue;const lb=row.map(c=>String(c||'').toLowerCase()).join(' ');
+if(lb.includes('chiller')&&!lb.includes('other')){const p=fSub(rows,r,'plan'),l=fSub(rows,r,'reali');if(p){const v=gN(p);if(v.some(x=>x!=null)){D.cp=v;fo++}}if(l){const v=gN(l);if(v.some(x=>x!=null)){D.cr=v;fo++}}}
+if(lb.includes('other')&&!lb.includes('chiller')){const p=fSub(rows,r,'plan'),l=fSub(rows,r,'reali');if(p){const v=gN(p);if(v.some(x=>x!=null)){D.op=v;fo++}}if(l){const v=gN(l);if(v.some(x=>x!=null)){D.or=v;fo++}}}
+if(lb.includes('consumption')||lb.includes('comsumption')){const p=fSub(rows,r,'plan'),l=fSub(rows,r,'reali');if(p){const v=gN(p);if(v.some(x=>x!=null)){D.ep=v;fo++}}if(l){const v=gN(l);if(v.some(x=>x!=null)){D.er=v;fo++}}}
+if((lb.includes('bulan')||lb.includes('month'))&&lb.includes('area')){for(let j=r+1;j<Math.min(r+14,rows.length);j++){const mr=rows[j];if(!mr)continue;const ml=String(mr[0]||mr[1]||'');const mi=M.findIndex(m=>ml.toLowerCase().startsWith(m.toLowerCase()));if(mi>=0){if(typeof mr[2]==='number')D.er[mi]=mr[2];if(typeof mr[3]==='number')D.ca[mi]=mr[3];fo++}}}
+}
+if(fo>0){shF(fn,fo);saveLocal();rfAll();toast(`✓ ${fn} — ${fo} data diimport & disimpan!`)}else toast("Format tidak dikenali",'er')}
+
+function pCSV(txt,fn){const ls=txt.trim().split('\n');if(ls.length<2){toast("CSV kosong",'er');return}const hd=ls[0].split(',').map(h=>h.trim().toLowerCase());let fo=0;
+for(let i=1;i<ls.length;i++){const c=ls[i].split(',').map(s=>s.trim());const mi=M.findIndex(m=>c[0]&&c[0].toLowerCase().startsWith(m.toLowerCase()));if(mi<0)continue;
+const g=n=>{const x=hd.findIndex(h=>h.includes(n));return x>=0&&c[x]?parseFloat(c[x]):null};
+const s=(k,v)=>{if(v!=null){D[k][mi]=v;fo++}};
+s('cp',g('chiller plan'));s('cr',g('chiller real'));s('op',g('others plan'));s('or',g('others real'));s('ep',g('energy plan'));s('er',g('energy real'));s('ca',g('co2 area'))}
+if(fo>0){shF(fn,fo);saveLocal();rfAll();toast(`✓ ${fn} — ${fo} cells updated & disimpan!`)}else toast("Tidak ada data cocok",'er')}
+
+function fSub(rows,sr,kw){for(let i=sr;i<Math.min(sr+5,rows.length);i++){const r=rows[i];if(!r)continue;for(let c=0;c<6;c++)if(String(r[c]||'').toLowerCase().includes(kw))return r}return null}
+function gN(row){let si=-1;for(let c=0;c<row.length;c++)if(typeof row[c]==='number'){si=c;break}if(si<0)return Array(12).fill(null);return Array.from({length:12},(_,i)=>{const v=si+i<row.length?row[si+i]:null;return typeof v==='number'?v:null})}
+function shF(fn,c){const e=document.getElementById('fst');e.classList.add('sh');document.getElementById('fn').textContent=fn;document.getElementById('fc').textContent=c}
+
+function rfAll(){Object.values(ch).forEach(c=>{if(c)c.destroy()});ch={};if(ct==='dash')rDash();if(ct==='inp')rT1();if(ct==='en'){rT2();rEC();}if(ct==='co'){rT3();rCC()}}
+function sw(t,b){ct=t;document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('on'));b.classList.add('on');['dash','inp','en','co'].forEach(x=>document.getElementById('v-'+x).classList.toggle('hd',x!==t));rfAll()}
+
+function exCSV(){let csv="Bulan,Chiller Plan,Chiller Real,Others Plan,Others Real,Total Plan,Total Real,Progress(%),Energy Plan,Energy Real,CO2 Area\n";
+M.forEach((m,i)=>{const t=tR(i),p=tP(i);csv+=`${m},${D.cp[i]||""},${D.cr[i]!=null?D.cr[i]:""},${D.op[i]||""},${D.or[i]!=null?D.or[i]:""},${p||""},${t!=null?t:""},${t&&t>0?(p/t*100).toFixed(1):""},${D.ep[i]||""},${D.er[i]!=null?D.er[i]:""},${D.ca[i]!=null?D.ca[i]:""}\n`});
+const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="KPI_Export.csv";a.click();toast("✓ CSV exported!")}
+
+// ======== KPI ========
+function rKPI(){let sum=0,cnt=0;for(let i=0;i<12;i++){const t=tR(i);if(t!=null&&t>0){sum+=t;cnt++}}const avg=cnt>0?sum/cnt:0;const tE=D.er.filter(v=>v!=null).reduce((a,b)=>a+b,0);const tC=D.er.filter(v=>v!=null).reduce((a,v)=>a+v*.85/1e3,0);
+document.getElementById('kp').innerHTML=[{l:"Avg Realisasi",v:f(avg),s:"kWh/m²",c:"#22c55e"},{l:"Target KPI",v:"≤12.4",s:"kWh/m²",c:"#378ADD"},{l:"Status",v:avg>0&&avg<=12.4?"Excellent":"Menunggu",s:avg>0&&avg<=12.4?"On target":"Data belum lengkap",c:avg>0&&avg<=12.4?"#06b6d4":"#f59e0b"},{l:"Energi YTD",v:fN(tE),s:"kWh",c:"#f59e0b"},{l:"CO₂ YTD",v:f(tC,1),s:"Ton",c:"#a855f7"}].map(k=>`<div class="kpi"><div class="bar" style="background:${k.c}"></div><div class="lb">${k.l}</div><div class="vl" style="color:${k.c}">${k.v}</div><div class="su">${k.s}</div></div>`).join('')}
+
+// ======== DASHBOARD ========
+function rDash(){rKPI();
+ch.c1=new Chart(document.getElementById('c1'),{type:'bar',data:{labels:M,datasets:[{label:'Ch.Plan',data:D.cp,backgroundColor:'#5DCAA5',stack:'p',barPercentage:.4,categoryPercentage:.8,order:4},{label:'Ot.Plan',data:D.op,backgroundColor:'#85B7EB',stack:'p',barPercentage:.4,categoryPercentage:.8,order:3},{label:'Ch.Real',data:D.cr,backgroundColor:'#1D9E75',stack:'r',barPercentage:.4,categoryPercentage:.8,order:2},{label:'Ot.Real',data:D.or,backgroundColor:'#378ADD',stack:'r',barPercentage:.4,categoryPercentage:.8,order:1},{label:'Target',data:Array(12).fill(12.4),type:'line',borderColor:'#ef4444',borderWidth:2,borderDash:[6,4],pointRadius:0,fill:false,order:0},{label:'Tren',data:M.map((_,i)=>tR(i)),type:'line',borderColor:'#f59e0b',borderWidth:2.5,pointRadius:4,pointBackgroundColor:'#f59e0b',fill:false,order:0,spanGaps:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8b90a5',padding:10,usePointStyle:true,pointStyle:'circle',font:{size:9}}},tooltip:tt},scales:{x:{stacked:true,grid:{display:false},ticks:{color:'#8b90a5',font:{weight:600,size:10}}},y:{stacked:true,grid:{color:'#2d324855'},max:16,ticks:{color:'#8b90a5',font:{size:9}}}}}});
+const pM=[],pC=[],pO=[];M.forEach((m,i)=>{const t=tR(i);if(t!=null&&t>0){pM.push(m);pC.push(D.cr[i]>0?D.cp[i]/D.cr[i]*100:0);pO.push(D.or[i]>0?D.op[i]/D.or[i]*100:0)}});
+ch.c2=new Chart(document.getElementById('c2'),{type:'bar',data:{labels:pM,datasets:[{label:'Chiller',data:pC,backgroundColor:'#7F77DD',borderRadius:4},{label:'Others',data:pO,backgroundColor:'#D85A30',borderRadius:4},{label:'100%',data:Array(pM.length).fill(100),type:'line',borderColor:'#8b90a5',borderWidth:1.5,borderDash:[6,4],pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8b90a5',usePointStyle:true,font:{size:9}}},tooltip:{...tt,callbacks:{label:c=>' '+c.dataset.label+': '+c.raw.toFixed(1)+'%'}}},scales:{x:{grid:{display:false},ticks:{color:'#8b90a5'}},y:{grid:{color:'#2d324855'},max:140,ticks:{color:'#8b90a5',callback:v=>v+'%'}}}}});
+ch.c3=new Chart(document.getElementById('c3'),{type:'bar',data:{labels:M,datasets:[{label:'Plan',data:D.ep,backgroundColor:'#85B7EB',borderRadius:3},{label:'Real',data:D.er,backgroundColor:'#378ADD',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8b90a5',usePointStyle:true,font:{size:9}}},tooltip:{...tt,callbacks:{label:c=>c.raw?' '+c.dataset.label+': '+fN(c.raw)+' kWh':'—'}}},scales:{x:{grid:{display:false},ticks:{color:'#8b90a5'}},y:{grid:{color:'#2d324855'},ticks:{color:'#8b90a5',callback:v=>(v/1e6).toFixed(1)+'M'}}}}});
+let a=0,b=0;const cP=M.map((_,i)=>{a+=tP(i);return a}),cR=M.map((_,i)=>{const t=tR(i);if(t!=null&&t>0){b+=t;return b}return null});
+ch.c4=new Chart(document.getElementById('c4'),{type:'line',data:{labels:M,datasets:[{label:'Plan',data:cP,borderColor:'#85B7EB',backgroundColor:'#85B7EB15',fill:true,borderWidth:2,tension:.3,pointRadius:2},{label:'Real',data:cR,borderColor:'#22c55e',backgroundColor:'#22c55e15',fill:true,borderWidth:2.5,tension:.3,pointRadius:4,pointBackgroundColor:'#22c55e',spanGaps:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8b90a5',usePointStyle:true,font:{size:9}}},tooltip:tt},scales:{x:{grid:{display:false},ticks:{color:'#8b90a5'}},y:{grid:{color:'#2d324855'},ticks:{color:'#8b90a5'}}}}});
+const cM=[],cV=[];M.forEach((m,i)=>{if(D.er[i]!=null){cM.push(m);cV.push(D.er[i]*.85/1e3)}});
+ch.c5=new Chart(document.getElementById('c5'),{type:'bar',data:{labels:cM,datasets:[{label:'CO₂',data:cV,backgroundColor:'#a855f7',borderRadius:5},{label:'Tren',data:cV,type:'line',borderColor:'#f59e0b',borderWidth:2.5,pointRadius:4,pointBackgroundColor:'#f59e0b',fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8b90a5',usePointStyle:true,font:{size:9}}},tooltip:{...tt,callbacks:{label:c=>' '+c.dataset.label+': '+c.raw.toFixed(1)+' Ton'}}},scales:{x:{grid:{display:false},ticks:{color:'#8b90a5'}},y:{grid:{color:'#2d324855'},ticks:{color:'#8b90a5'}}}}});}
+
+// ======== INPUT TABLE ========
+function rT1(){const qH=M.map((m,i)=>'<th style="background:'+QC[QM[i]]+'33">'+m+'</th>').join('');let h='<thead><tr><th>No</th><th>Item</th><th>Rec</th>'+qH+'</tr></thead><tbody>';
+h+=mR(1,'Chiller','#22c55e','cp','cr');h+=mR(2,'Others','#378ADD','op','or');
+h+='<tr class="tr"><td colspan="2" style="color:#f59e0b;font-weight:700;text-align:center">Total</td><td class="tl">Plan</td>'+M.map((_,i)=>'<td class="cm" style="font-weight:700">'+tP(i).toFixed(2)+'</td>').join('')+'</tr>';
+h+='<tr><td colspan="2"></td><td class="tl gn">Real</td>'+M.map((_,i)=>{const t=tR(i);return'<td class="cm gn" style="font-weight:700">'+(t!=null&&t>0?t.toFixed(2):'—')+'</td>'}).join('')+'</tr>';
+h+='<tr><td colspan="2"></td><td class="tl dm">%</td>'+M.map((_,i)=>{const t=tR(i),p=tP(i);const v=t&&t>0?(p/t*100).toFixed(1):'—';return'<td class="cm '+(v!=='—'&&parseFloat(v)>100?'gn':'og')+'" style="font-weight:700">'+(v!=='—'?v+'%':'—')+'</td>'}).join('')+'</tr>';
+h+='<tr class="ks"><td colspan="3" style="color:#1D9E75;font-weight:700">Target ≤12.4</td>'+M.map((_,i)=>{const t=tR(i);return t!=null&&t>0?(t<=12.4?'<td class="cm gn" style="font-weight:700">✓</td>':'<td class="cm rd" style="font-weight:700">✗</td>'):'<td class="cm dm">—</td>'}).join('')+'</tr></tbody>';document.getElementById('t1').innerHTML=h}
+function mR(n,nm,cl,pk,rk){let h='<tr><td rowspan="3" style="text-align:center;font-weight:700">'+n+'</td><td rowspan="3" style="color:'+cl+';font-weight:700">'+nm+'</td><td class="tl">Plan</td>'+D[pk].map(v=>'<td class="cm dm">'+(v!=null?v.toFixed(2):'—')+'</td>').join('')+'</tr>';
+h+='<tr><td class="tl gn">Real</td>'+D[rk].map((v,i)=>'<td><input class="cl" value="'+(v!=null?v:'')+'" onchange="D.'+rk+'['+i+']=this.value===\'\'?null:parseFloat(this.value);rT1();saveLocal()"></td>').join('')+'</tr>';
+h+='<tr><td class="tl dm">%</td>'+D[rk].map((v,i)=>{const p=pc(D[pk][i],v);return'<td class="cm '+(p!=='—'&&parseFloat(p)>100?'gn':'og')+'">'+(p!=='—'?p+'%':'—')+'</td>'}).join('')+'</tr>';return h}
+
+// ======== ENERGY ========
+function rT2(){const qH=M.map((m,i)=>'<th style="background:'+QC[QM[i]]+'33">'+m+'</th>').join('');let h='<thead><tr><th>Record</th>'+qH+'</tr></thead><tbody>';
+h+='<tr><td class="tl dm">Plan</td>'+D.ep.map((v,i)=>'<td><input class="cl" value="'+(v!=null?v:'')+'" onchange="D.ep['+i+']=this.value===\'\'?null:parseFloat(this.value);rT2();rEC();saveLocal()"></td>').join('')+'</tr>';
+h+='<tr><td class="tl gn">Real</td>'+D.er.map((v,i)=>'<td><input class="cl" value="'+(v!=null?v:'')+'" onchange="D.er['+i+']=this.value===\'\'?null:parseFloat(this.value);rT2();rEC();saveLocal()"></td>').join('')+'</tr>';
+h+='<tr><td class="tl dm">%</td>'+D.er.map((v,i)=>{if(v==null)return'<td class="cm dm">—</td>';const p=(1-(v-D.ep[i])/D.ep[i])*100;return'<td class="cm '+(p>=100?'gn':'og')+'">'+p.toFixed(1)+'%</td>'}).join('')+'</tr></tbody>';document.getElementById('t2').innerHTML=h}
+function rEC(){if(ch.c6)ch.c6.destroy();if(ch.c7)ch.c7.destroy();
+ch.c6=new Chart(document.getElementById('c6'),{type:'bar',data:{labels:M,datasets:[{label:'Plan',data:D.ep,backgroundColor:'#85B7EB',borderRadius:3},{label:'Real',data:D.er,backgroundColor:'#378ADD',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8b90a5',usePointStyle:true,font:{size:9}}},tooltip:{...tt,callbacks:{label:c=>c.raw?' '+fN(c.raw)+' kWh':'—'}}},scales:{x:{grid:{display:false},ticks:{color:'#8b90a5'}},y:{grid:{color:'#2d324855'},ticks:{color:'#8b90a5',callback:v=>(v/1e6).toFixed(1)+'M'}}}}});
+let a=0,b=0;const cp=M.map((_,i)=>{a+=(D.ep[i]||0);return a}),cr=M.map((_,i)=>{if(D.er[i]!=null){b+=D.er[i];return b}return null});
+ch.c7=new Chart(document.getElementById('c7'),{type:'line',data:{labels:M,datasets:[{label:'Plan',data:cp,borderColor:'#85B7EB',backgroundColor:'#85B7EB15',fill:true,borderWidth:2,tension:.3,pointRadius:2},{label:'Real',data:cr,borderColor:'#22c55e',backgroundColor:'#22c55e15',fill:true,borderWidth:2.5,tension:.3,pointRadius:4,pointBackgroundColor:'#22c55e',spanGaps:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8b90a5',usePointStyle:true,font:{size:9}}},tooltip:{...tt,callbacks:{label:c=>c.raw!=null?' '+fN(c.raw)+' kWh':'—'}}},scales:{x:{grid:{display:false},ticks:{color:'#8b90a5'}},y:{grid:{color:'#2d324855'},ticks:{color:'#8b90a5',callback:v=>(v/1e6).toFixed(1)+'M'}}}}});}
+
+// ======== CO2 ========
+function rT3(){const qH=M.map((m,i)=>'<th style="background:'+QC[QM[i]]+'33">'+m+'</th>').join('');let h='<thead><tr><th>Param</th>'+qH+'</tr></thead><tbody>';
+h+='<tr><td class="tl bl">kWh</td>'+D.er.map(v=>'<td class="cm">'+(v!=null?fN(v):'—')+'</td>').join('')+'</tr>';
+h+='<tr><td class="tl gn">Area m²</td>'+D.ca.map((v,i)=>'<td><input class="cl" value="'+(v!=null?v:'')+'" onchange="D.ca['+i+']=this.value===\'\'?null:parseFloat(this.value);rT3();rCC();saveLocal()"></td>').join('')+'</tr>';
+h+='<tr><td class="tl og">Intensitas</td>'+M.map((_,i)=>{const k=D.er[i],a=D.ca[i];return'<td class="cm og">'+(k&&a?(k/a).toFixed(2):'—')+'</td>'}).join('')+'</tr>';
+h+='<tr><td class="tl pp" style="font-weight:700">CO₂ Ton</td>'+M.map((_,i)=>{const k=D.er[i];return'<td class="cm pp" style="font-weight:700">'+(k!=null?(k*.85/1e3).toFixed(1):'—')+'</td>'}).join('')+'</tr></tbody>';document.getElementById('t3').innerHTML=h}
+function rCC(){if(ch.c8)ch.c8.destroy();if(ch.c9)ch.c9.destroy();
+const ms=[],em=[],it=[];M.forEach((m,i)=>{if(D.er[i]!=null){ms.push(m);em.push(D.er[i]*.85/1e3);const a=D.ca[i];it.push(a?D.er[i]/a:null)}});
+ch.c8=new Chart(document.getElementById('c8'),{type:'bar',data:{labels:ms,datasets:[{label:'CO₂',data:em,backgroundColor:'#a855f7',borderRadius:5},{label:'Tren',data:em,type:'line',borderColor:'#f59e0b',borderWidth:2.5,pointRadius:4,pointBackgroundColor:'#f59e0b',fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8b90a5',usePointStyle:true,font:{size:9}}},tooltip:{...tt,callbacks:{label:c=>' '+c.raw.toFixed(1)+' Ton'}}},scales:{x:{grid:{display:false},ticks:{color:'#8b90a5'}},y:{grid:{color:'#2d324855'},ticks:{color:'#8b90a5'}}}}});
+ch.c9=new Chart(document.getElementById('c9'),{type:'bar',data:{labels:ms,datasets:[{label:'Intensitas',data:it,backgroundColor:'#f59e0b',borderRadius:5},{label:'Tren',data:it,type:'line',borderColor:'#ef4444',borderWidth:2,pointRadius:3,pointBackgroundColor:'#ef4444',fill:false},{label:'Target',data:Array(ms.length).fill(12.4),type:'line',borderColor:'#22c55e',borderWidth:1.5,borderDash:[6,4],pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8b90a5',usePointStyle:true,font:{size:9}}},tooltip:{...tt,callbacks:{label:c=>c.raw!=null?' '+c.raw.toFixed(2):''}}},scales:{x:{grid:{display:false},ticks:{color:'#8b90a5'}},y:{grid:{color:'#2d324855'},max:20,ticks:{color:'#8b90a5'}}}}});}
+
+rDash();
+</script>
+</body>
+</html>
